@@ -6,7 +6,7 @@
   <style>
     body { font-family: Arial, sans-serif; padding: 20px; }
     label, select, input, textarea { display: block; margin-bottom: 10px; }
-    textarea { width: 100%; height: 150px; }
+    textarea { width: 100%; height: 100px; }
     .hidden { display: none; }
     .section { margin-top: 20px; }
     #receipt { white-space: pre-wrap; border: 1px solid #ccc; padding: 10px; background: #f9f9f9; }
@@ -42,6 +42,10 @@
     <label id="labelBdtRent">БДТ аренда (открытая): <input id="bdtRent" type="number"></label>
 
     <label id="labelBirthday"><input type="checkbox" id="birthday"> Есть именинник</label>
+
+    <label id="labelPrepayToggle">
+      <input type="checkbox" id="enablePrepay" checked onchange="togglePrepay()"> Включить предоплату
+    </label>
     <label id="labelPrepay">Предоплата (фиксированная 10000): <input id="prepay" type="number" value="10000" disabled></label>
 
     <label>Продление мангалки (часов): <input id="bbqHours" type="number"></label>
@@ -100,7 +104,13 @@
       show('labelBdtRent', game === 'open');
 
       show('labelBirthday', game !== 'open');
+      show('labelPrepayToggle', game !== 'open');
       show('labelPrepay', game !== 'open');
+    }
+
+    function togglePrepay() {
+      const enabled = document.getElementById('enablePrepay').checked;
+      document.getElementById('prepay').disabled = !enabled;
     }
 
     function formatDate(dateStr) {
@@ -123,6 +133,7 @@
       const game = document.getElementById('game').value;
       const datetime = formatDate(document.getElementById('datetime').value);
       const comment = document.getElementById('comment')?.value || '';
+      const isPrepayEnabled = document.getElementById('enablePrepay')?.checked;
       let total = 0, noPrepay = 0, receipt = '';
 
       const players = +document.getElementById('players').value || 0;
@@ -130,7 +141,7 @@
       const balls = +document.getElementById('balls').value || 0;
       const grenades = +document.getElementById('grenades').value || 0;
       const birthday = document.getElementById('birthday')?.checked;
-      const prepay = (game !== 'open') ? 10000 : 0;
+      const prepay = (game !== 'open' && isPrepayEnabled) ? 10000 : 0;
 
       const rent = +document.getElementById('rent').value || 0;
       const own = +document.getElementById('own').value || 0;
@@ -142,18 +153,30 @@
       const quadPrice = +document.getElementById('quad').value || 0;
 
       let displayPlayers = players;
+      let playerTotal = 0;
+
       if (game === 'airsoft') {
-        total += players * prices.airsoft.player + mags * prices.airsoft.mag + grenades * prices.airsoft.grenade;
+        playerTotal = players * prices.airsoft.player;
+        total += playerTotal + mags * prices.airsoft.mag + grenades * prices.airsoft.grenade;
         if (birthday) total -= prices.airsoft.player;
       } else if (game === 'lasertag') {
-        total += players * prices.lasertag.player;
+        playerTotal = players * prices.lasertag.player;
+        total += playerTotal;
         if (birthday) total -= prices.lasertag.player;
       } else if (game === 'paintball') {
         const magPacks = Math.ceil(balls / 50);
-        total += players * prices.paintball.player + magPacks * prices.paintball.mag50 + grenades * prices.paintball.grenade;
+        playerTotal = players * prices.paintball.player;
+        total += playerTotal + magPacks * prices.paintball.mag50 + grenades * prices.paintball.grenade;
         if (birthday) total -= prices.paintball.player;
       } else if (game === 'open') {
-        total += rent * prices.open.rent + own * prices.open.own + driveRent * prices.open.driveRent + bdtOwn * prices.open.bdtOwn + bdtRent * prices.open.bdtRent + mags * prices.open.mag + grenades * prices.open.grenade;
+        const rentSum = rent * prices.open.rent;
+        const ownSum = own * prices.open.own;
+        const driveSum = driveRent * prices.open.driveRent;
+        const bdtOwnSum = bdtOwn * prices.open.bdtOwn;
+        const bdtRentSum = bdtRent * prices.open.bdtRent;
+
+        playerTotal = rentSum + ownSum + driveSum + bdtOwnSum + bdtRentSum;
+        total += playerTotal + mags * prices.open.mag + grenades * prices.open.grenade;
         displayPlayers = rent + own + driveRent + bdtOwn + bdtRent;
       }
 
@@ -162,25 +185,14 @@
 
       receipt += `1. Игра: ${getGameName(game)}\n`;
       receipt += `2. Дата/время: ${datetime}\n`;
-      if (game === 'open') {
-        receipt += `3. Количество игроков: \n`;
-        if (rent) receipt += `Аренда - ${rent} (${rent * prices.open.rent})\n`;
-        if (own) receipt += `Со своим - ${own} (${own * prices.open.own})\n`;
-        if (driveRent) receipt += `Аренда привода - ${driveRent} (${driveRent * prices.open.driveRent})\n`;
-        if (bdtOwn) receipt += `Бдт со своим - ${bdtOwn} (${bdtOwn * prices.open.bdtOwn})\n`;
-        if (bdtRent) receipt += `Бдт аренда - ${bdtRent} (${bdtRent * prices.open.bdtRent})\n`;
-      } else {
-        receipt += `3. Количество игроков: ${displayPlayers}\n`;
-      }
+      receipt += `3. Количество игроков: ${displayPlayers} (${playerTotal})\n`;
 
       if (game === 'paintball') {
         const magPacks = Math.ceil(balls / 50);
         receipt += `4. Магазины: ${magPacks}x50 (${magPacks * prices.paintball.mag50})\n`;
-      } else if (game !== 'lasertag') {
-        const magPrice = prices[game]?.mag || prices.open.mag || 0;
-        receipt += `4. Магазины: ${mags} (${mags * magPrice})\n`;
       } else {
-        receipt += `4. Магазины: -\n`;
+        const magPrice = (game === 'lasertag') ? 0 : (prices[game]?.mag || prices.open.mag || 0);
+        receipt += `4. Магазины: ${mags} (${mags * magPrice})\n`;
       }
 
       const grenadePrice = prices[game]?.grenade || prices.open.grenade || 0;
