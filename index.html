@@ -46,7 +46,7 @@
     <label id="labelPrepayToggle">
       <input type="checkbox" id="enablePrepay" checked onchange="togglePrepay()"> Включить предоплату
     </label>
-    <label id="labelPrepay">Предоплата (фиксированная 10000): <input id="prepay" type="number" value="10000" enable></label>
+    <label id="labelPrepay">Предоплата (фиксированная 10000): <input id="prepay" type="number" value="10000" disabled></label>
 
     <label>Продление мангалки (часов): <input id="bbqHours" type="number"></label>
     <label>Прокат квадроциклов:
@@ -199,15 +199,15 @@
       receipt += `5. Гранаты: ${grenades} (${grenades * grenadePrice})\n`;
       receipt += `6. Предоплата: ${prepay}тг\n`;
       receipt += `7. Именинник: ${birthday ? 'Да' : 'Нет'}\n`;
-      receipt += `8. Итого: ${total}\n`;
-      receipt += `9. Без предоплаты: ${noPrepay}\n`;
+      receipt += `8. Итого: ${total}тг\n`;
+      receipt += `9. Без предоплаты: ${noPrepay}тг\n`;
       receipt += `10. Комментарии: ${comment}`;
 
       if (bbqHours > 0) {
-        receipt += `\nДополнительно: Мангалка ${bbqHours} ч. (${bbqHours * prices.extras.bbqHour})`;
+        receipt += `\nДополнительно: Мангалка ${bbqHours} ч. (${bbqHours * prices.extras.bbqHour}тг)`;
       }
       if (quadPrice > 0) {
-        receipt += `\nДополнительно: Квадроцикл (${quadPrice})`;
+        receipt += `\nДополнительно: Квадроцикл (${quadPrice}тг)`;
       }
 
       document.getElementById('receipt').textContent = receipt;
