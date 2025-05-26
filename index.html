@@ -17,7 +17,7 @@
     }
 
     .container {
-      max-width: 600px;
+      max-width: 800px;
       margin: 0 auto;
       background: #fff;
       padding: 20px;
@@ -36,7 +36,7 @@
     input[type="datetime-local"],
     select,
     textarea {
-      padding: 8px;
+      padding: 10px;
       font-size: 1rem;
       border: 1px solid #ccc;
       border-radius: 5px;
@@ -55,8 +55,10 @@
       margin-bottom: 10px;
     }
 
-    .checkbox-label input[type="checkbox"] {
-      margin-right: 10px;
+    .checkbox-label label {
+      margin: 0;
+      margin-left: 8px;
+      font-weight: normal;
     }
 
     button {
@@ -67,6 +69,7 @@
       border-radius: 5px;
       cursor: pointer;
       font-size: 1rem;
+      margin-top: 10px;
     }
 
     button:hover {
@@ -74,7 +77,7 @@
     }
 
     .section {
-      margin-top: 20px;
+      margin-top: 30px;
     }
 
     #receipt {
@@ -86,7 +89,7 @@
       font-family: monospace;
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 768px) {
       body {
         padding: 10px;
       }
@@ -158,6 +161,7 @@
         <input type="checkbox" id="enablePrepay" checked onchange="togglePrepay()">
         <label for="enablePrepay">Включить предоплату</label>
       </div>
+
       <label id="labelPrepay">Предоплата (фиксированная 10000):
         <input id="prepay" type="number" value="10000" disabled>
       </label>
