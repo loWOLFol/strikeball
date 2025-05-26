@@ -3,224 +3,189 @@
 <head>
   <meta charset="UTF-8">
   <title>Калькулятор услуг</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    label, select, input, textarea { display: block; margin-bottom: 10px; }
-    textarea { width: 100%; height: 100px; }
-    .hidden { display: none; }
-    .section { margin-top: 20px; }
-    #receipt { white-space: pre-wrap; border: 1px solid #ccc; padding: 10px; background: #f9f9f9; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f2f2f2;
+    }
+
+    h1, h2 {
+      text-align: center;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 15px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="datetime-local"],
+    select,
+    textarea {
+      padding: 8px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    textarea {
+      height: 100px;
+      resize: vertical;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .checkbox-label input[type="checkbox"] {
+      margin-right: 10px;
+    }
+
+    button {
+      background-color: #28a745;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    .section {
+      margin-top: 20px;
+    }
+
+    #receipt {
+      white-space: pre-wrap;
+      border: 1px solid #ccc;
+      padding: 15px;
+      background: #fafafa;
+      border-radius: 5px;
+      font-family: monospace;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+
+      .container {
+        padding: 15px;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>Калькулятор услуг</h1>
+  <div class="container">
+    <h1>Калькулятор услуг</h1>
 
-  <label>Выбор игры:
-    <select id="game" onchange="updateForm()">
-      <option value="">-- Выберите игру --</option>
-      <option value="airsoft">Страйкбол</option>
-      <option value="lasertag">Лазертаг</option>
-      <option value="paintball">Пейнтбол</option>
-      <option value="open">Страйкбол (открытая)</option>
-    </select>
-  </label>
-
-  <label>Дата и время:
-    <input type="datetime-local" id="datetime">
-  </label>
-
-  <div id="fields">
-    <label id="labelPlayers">Количество игроков: <input id="players" type="number"></label>
-    <label id="labelBalls">Количество шаров (для пейнтбола): <input id="balls" type="number"></label>
-    <label id="labelMags">Магазины: <input id="mags" type="number"></label>
-    <label id="labelGrenades">Гранаты: <input id="grenades" type="number"></label>
-
-    <label id="labelRent">Аренда (открытая): <input id="rent" type="number"></label>
-    <label id="labelOwn">Со своим (открытая): <input id="own" type="number"></label>
-    <label id="labelDrive">Аренда привода (открытая): <input id="driveRent" type="number"></label>
-    <label id="labelBdtOwn">БДТ со своим (открытая): <input id="bdtOwn" type="number"></label>
-    <label id="labelBdtRent">БДТ аренда (открытая): <input id="bdtRent" type="number"></label>
-
-    <label id="labelBirthday"><input type="checkbox" id="birthday"> Есть именинник</label>
-
-    <label id="labelPrepayToggle">
-      <input type="checkbox" id="enablePrepay" checked onchange="togglePrepay()"> Включить предоплату
-    </label>
-    <label id="labelPrepay">Предоплата (фиксированная 10000): <input id="prepay" type="number" value="10000" disabled></label>
-
-    <label>Продление мангалки (часов): <input id="bbqHours" type="number"></label>
-    <label>Прокат квадроциклов:
-      <select id="quad">
-        <option value="0">-- Не выбрано --</option>
-        <option value="4000">20 мин (4000)</option>
-        <option value="7000">40 мин (7000)</option>
-        <option value="10000">1 час (10000)</option>
+    <label>Выбор игры:
+      <select id="game" onchange="updateForm()">
+        <option value="">-- Выберите игру --</option>
+        <option value="airsoft">Страйкбол</option>
+        <option value="lasertag">Лазертаг</option>
+        <option value="paintball">Пейнтбол</option>
+        <option value="open">Страйкбол (открытая)</option>
       </select>
     </label>
 
-    <label>Комментарии:<br><textarea id="comment"></textarea></label>
+    <label>Дата и время:
+      <input type="datetime-local" id="datetime">
+    </label>
+
+    <div id="fields">
+      <label id="labelPlayers">Количество игроков:
+        <input id="players" type="number">
+      </label>
+      <label id="labelBalls">Количество шаров (для пейнтбола):
+        <input id="balls" type="number">
+      </label>
+      <label id="labelMags">Магазины:
+        <input id="mags" type="number">
+      </label>
+      <label id="labelGrenades">Гранаты:
+        <input id="grenades" type="number">
+      </label>
+
+      <label id="labelRent">Аренда (открытая):
+        <input id="rent" type="number">
+      </label>
+      <label id="labelOwn">Со своим (открытая):
+        <input id="own" type="number">
+      </label>
+      <label id="labelDrive">Аренда привода (открытая):
+        <input id="driveRent" type="number">
+      </label>
+      <label id="labelBdtOwn">БДТ со своим (открытая):
+        <input id="bdtOwn" type="number">
+      </label>
+      <label id="labelBdtRent">БДТ аренда (открытая):
+        <input id="bdtRent" type="number">
+      </label>
+
+      <div class="checkbox-label" id="labelBirthday">
+        <input type="checkbox" id="birthday">
+        <label for="birthday">Есть именинник</label>
+      </div>
+
+      <div class="checkbox-label" id="labelPrepayToggle">
+        <input type="checkbox" id="enablePrepay" checked onchange="togglePrepay()">
+        <label for="enablePrepay">Включить предоплату</label>
+      </div>
+      <label id="labelPrepay">Предоплата (фиксированная 10000):
+        <input id="prepay" type="number" value="10000" disabled>
+      </label>
+
+      <label>Продление мангалки (часов):
+        <input id="bbqHours" type="number">
+      </label>
+      <label>Прокат квадроциклов:
+        <select id="quad">
+          <option value="0">-- Не выбрано --</option>
+          <option value="4000">20 мин (4000)</option>
+          <option value="7000">40 мин (7000)</option>
+          <option value="10000">1 час (10000)</option>
+        </select>
+      </label>
+
+      <label>Комментарии:
+        <textarea id="comment"></textarea>
+      </label>
+    </div>
+
+    <button onclick="generateReceipt()">Сформировать чек</button>
+
+    <div class="section">
+      <h2>Ведомость (чек)</h2>
+      <div id="receipt"></div>
+      <button onclick="copyReceipt()">Скопировать чек</button>
+    </div>
   </div>
-
-  <button onclick="generateReceipt()">Сформировать чек</button>
-
-  <div class="section">
-    <h2>Ведомость (чек)</h2>
-    <div id="receipt"></div>
-    <button onclick="copyReceipt()">Скопировать чек</button>
-  </div>
-
-  <script>
-    const prices = {
-      airsoft: { player: 6000, mag: 1200, grenade: 1000 },
-      lasertag: { player: 4000 },
-      paintball: { player: 7500, mag50: 1000, grenade: 1000 },
-      open: {
-        rent: 6000,
-        own: 2000,
-        driveRent: 4000,
-        bdtOwn: 500,
-        bdtRent: 3000,
-        mag: 1200,
-        grenade: 1000
-      },
-      extras: {
-        bbqHour: 6000
-      }
-    };
-
-    function updateForm() {
-      const game = document.getElementById('game').value;
-      const show = (id, visible) => document.getElementById(id).style.display = visible ? 'block' : 'none';
-
-      show('labelPlayers', game !== 'open');
-      show('labelBalls', game === 'paintball');
-      show('labelMags', game !== 'lasertag');
-      show('labelGrenades', game === 'airsoft' || game === 'paintball' || game === 'open');
-
-      show('labelRent', game === 'open');
-      show('labelOwn', game === 'open');
-      show('labelDrive', game === 'open');
-      show('labelBdtOwn', game === 'open');
-      show('labelBdtRent', game === 'open');
-
-      show('labelBirthday', game !== 'open');
-      show('labelPrepayToggle', game !== 'open');
-      show('labelPrepay', game !== 'open');
-    }
-
-    function togglePrepay() {
-      const enabled = document.getElementById('enablePrepay').checked;
-      document.getElementById('prepay').disabled = !enabled;
-    }
-
-    function formatDate(dateStr) {
-      if (!dateStr) return '';
-      const date = new Date(dateStr);
-      return `${date.toLocaleDateString('ru-RU')} / ${date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}`;
-    }
-
-    function getGameName(value) {
-      switch (value) {
-        case 'airsoft': return 'Страйкбол';
-        case 'lasertag': return 'Лазертаг';
-        case 'paintball': return 'Пейнтбол';
-        case 'open': return 'Страйкбол (открытая)';
-        default: return '';
-      }
-    }
-
-    function generateReceipt() {
-      const game = document.getElementById('game').value;
-      const datetime = formatDate(document.getElementById('datetime').value);
-      const comment = document.getElementById('comment')?.value || '';
-      const isPrepayEnabled = document.getElementById('enablePrepay')?.checked;
-      let total = 0, noPrepay = 0, receipt = '';
-
-      const players = +document.getElementById('players').value || 0;
-      const mags = +document.getElementById('mags').value || 0;
-      const balls = +document.getElementById('balls').value || 0;
-      const grenades = +document.getElementById('grenades').value || 0;
-      const birthday = document.getElementById('birthday')?.checked;
-      const prepay = (game !== 'open' && isPrepayEnabled) ? 10000 : 0;
-
-      const rent = +document.getElementById('rent').value || 0;
-      const own = +document.getElementById('own').value || 0;
-      const driveRent = +document.getElementById('driveRent').value || 0;
-      const bdtOwn = +document.getElementById('bdtOwn').value || 0;
-      const bdtRent = +document.getElementById('bdtRent').value || 0;
-
-      const bbqHours = +document.getElementById('bbqHours').value || 0;
-      const quadPrice = +document.getElementById('quad').value || 0;
-
-      let displayPlayers = players;
-      let playerTotal = 0;
-
-      if (game === 'airsoft') {
-        playerTotal = players * prices.airsoft.player;
-        total += playerTotal + mags * prices.airsoft.mag + grenades * prices.airsoft.grenade;
-        if (birthday) total -= prices.airsoft.player;
-      } else if (game === 'lasertag') {
-        playerTotal = players * prices.lasertag.player;
-        total += playerTotal;
-        if (birthday) total -= prices.lasertag.player;
-      } else if (game === 'paintball') {
-        const magPacks = Math.ceil(balls / 50);
-        playerTotal = players * prices.paintball.player;
-        total += playerTotal + magPacks * prices.paintball.mag50 + grenades * prices.paintball.grenade;
-        if (birthday) total -= prices.paintball.player;
-      } else if (game === 'open') {
-        const rentSum = rent * prices.open.rent;
-        const ownSum = own * prices.open.own;
-        const driveSum = driveRent * prices.open.driveRent;
-        const bdtOwnSum = bdtOwn * prices.open.bdtOwn;
-        const bdtRentSum = bdtRent * prices.open.bdtRent;
-
-        playerTotal = rentSum + ownSum + driveSum + bdtOwnSum + bdtRentSum;
-        total += playerTotal + mags * prices.open.mag + grenades * prices.open.grenade;
-        displayPlayers = rent + own + driveRent + bdtOwn + bdtRent;
-      }
-
-      total += bbqHours * prices.extras.bbqHour + quadPrice;
-      noPrepay = total - prepay;
-
-      receipt += `1. Игра: ${getGameName(game)}\n`;
-      receipt += `2. Дата/время: ${datetime}\n`;
-      receipt += `3. Количество игроков: ${displayPlayers} (${playerTotal})\n`;
-
-      if (game === 'paintball') {
-        const magPacks = Math.ceil(balls / 50);
-        receipt += `4. Магазины: ${magPacks}x50 (${magPacks * prices.paintball.mag50})\n`;
-      } else {
-        const magPrice = (game === 'lasertag') ? 0 : (prices[game]?.mag || prices.open.mag || 0);
-        receipt += `4. Магазины: ${mags} (${mags * magPrice})\n`;
-      }
-
-      const grenadePrice = prices[game]?.grenade || prices.open.grenade || 0;
-      receipt += `5. Гранаты: ${grenades} (${grenades * grenadePrice})\n`;
-      receipt += `6. Предоплата: ${prepay}тг\n`;
-      receipt += `7. Именинник: ${birthday ? 'Да' : 'Нет'}\n`;
-      receipt += `8. Итого: ${total}тг\n`;
-      receipt += `9. Без предоплаты: ${noPrepay}тг\n`;
-      receipt += `10. Комментарии: ${comment}`;
-
-      if (bbqHours > 0) {
-        receipt += `\nДополнительно: Мангалка ${bbqHours} ч. (${bbqHours * prices.extras.bbqHour}тг)`;
-      }
-      if (quadPrice > 0) {
-        receipt += `\nДополнительно: Квадроцикл (${quadPrice}тг)`;
-      }
-
-      document.getElementById('receipt').textContent = receipt;
-    }
-
-    function copyReceipt() {
-      const receipt = document.getElementById('receipt').textContent;
-      navigator.clipboard.writeText(receipt).then(() => {
-        alert('Чек скопирован в буфер обмена');
-      });
-    }
-
-    updateForm();
-  </script>
 </body>
 </html>
