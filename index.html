@@ -55,10 +55,8 @@
       margin-bottom: 10px;
     }
 
-    .checkbox-label label {
-      margin: 0;
-      margin-left: 8px;
-      font-weight: normal;
+    .checkbox-label input[type="checkbox"] {
+      margin-right: 8px;
     }
 
     button {
@@ -101,6 +99,10 @@
       button {
         width: 100%;
       }
+    }
+
+    .hidden {
+      display: none;
     }
   </style>
 </head>
@@ -191,5 +193,45 @@
       <button onclick="copyReceipt()">Скопировать чек</button>
     </div>
   </div>
+
+  <script>
+    function togglePrepay() {
+      const enablePrepay = document.getElementById('enablePrepay').checked;
+      const prepayInput = document.getElementById('prepay');
+      prepayInput.disabled = !enablePrepay;
+    }
+
+    function updateForm() {
+      const game = document.getElementById('game').value;
+      const labels = {
+        players: 'labelPlayers',
+        balls: 'labelBalls',
+        mags: 'labelMags',
+        grenades: 'labelGrenades',
+        rent: 'labelRent',
+        own: 'labelOwn',
+        drive: 'labelDrive',
+        bdtOwn: 'labelBdtOwn',
+        bdtRent: 'labelBdtRent',
+        birthday: 'labelBirthday',
+        prepayToggle: 'labelPrepayToggle',
+        prepay: 'labelPrepay'
+      };
+
+      for (const key in labels) {
+        document.getElementById(labels[key]).classList.add('hidden');
+      }
+
+      if (game === 'airsoft') {
+        ['players', 'mags', 'grenades', 'birthday', 'prepayToggle', 'prepay'].forEach(k => document.getElementById(labels[k]).classList.remove('hidden'));
+      } else if (game === 'lasertag') {
+        ['players', 'birthday', 'prepayToggle', 'prepay'].forEach(k => document.getElementById(labels[k]).classList.remove('hidden'));
+      } else if (game === 'paintball') {
+        ['players', 'balls', 'grenades', 'birthday', 'prepayToggle', 'prepay'].forEach(k => document.getElementById(labels[k]).classList.remove('hidden'));
+      } else if (game === 'open') {
+        ['rent', 'own', 'drive', 'bdtOwn', 'bdtRent', 'mags', 'grenades'].forEach(k => document.getElementById(labels[k]).classList.remove('hidden'));
+      }
+    }
+  </script>
 </body>
 </html>
