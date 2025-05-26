@@ -231,6 +231,15 @@
       } else if (game === 'open') {
         ['rent', 'own', 'drive', 'bdtOwn', 'bdtRent', 'mags', 'grenades', 'prepayToggle', 'prepay'].forEach(k => document.getElementById(labels[k]).classList.remove('hidden'));
       }
+
+      // Автоотключение предоплаты для открытой игры
+      if (game === 'open') {
+        document.getElementById('enablePrepay').checked = false;
+        document.getElementById('prepay').disabled = true;
+      } else {
+        document.getElementById('enablePrepay').checked = true;
+        document.getElementById('prepay').disabled = false;
+      }
     }
 
     function generateReceipt() {
@@ -300,9 +309,11 @@
       } else {
         let costPerPlayer = game === 'airsoft' ? 6000 : game === 'lasertag' ? 4000 : 7500;
         let totalPlayers = players;
-        if (hasBirthday && players > 0) {
+        
+        if (hasBirthday && players > 0 && game !== 'open') {
           totalPlayers -= 1;
         }
+        
         total += totalPlayers * costPerPlayer;
         receipt += `3. Количество игроков: ${players} (${totalPlayers * costPerPlayer})\n`;
       }
