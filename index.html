@@ -232,6 +232,134 @@
         ['rent', 'own', 'drive', 'bdtOwn', 'bdtRent', 'mags', 'grenades'].forEach(k => document.getElementById(labels[k]).classList.remove('hidden'));
       }
     }
+
+    function generateReceipt() {
+      const game = document.getElementById('game').value;
+      const datetimeRaw = document.getElementById('datetime').value;
+      const dateObj = new Date(datetimeRaw);
+      const dateFormatted = datetimeRaw ? `${dateObj.toLocaleDateString('ru-RU')} / ${dateObj.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}` : '';
+    
+      const players = +document.getElementById('players').value || 0;
+      const balls = +document.getElementById('balls').value || 0;
+      const mags = +document.getElementById('mags').value || 0;
+      const grenades = +document.getElementById('grenades').value || 0;
+    
+      const rent = +document.getElementById('rent').value || 0;
+      const own = +document.getElementById('own').value || 0;
+      const driveRent = +document.getElementById('driveRent').value || 0;
+      const bdtOwn = +document.getElementById('bdtOwn').value || 0;
+      const bdtRent = +document.getElementById('bdtRent').value || 0;
+    
+      const hasBirthday = document.getElementById('birthday').checked;
+      const enablePrepay = document.getElementById('enablePrepay').checked;
+      const prepay = enablePrepay ? 10000 : 0;
+    
+      const bbqHours = +document.getElementById('bbqHours').value || 0;
+      const quad = +document.getElementById('quad').value || 0;
+    
+      const comment = document.getElementById('comment').value;
+    
+      let total = 0;
+      let receipt = '';
+    
+      // Название игры на русском
+      const gameNames = {
+        airsoft: 'страйкбол',
+        lasertag: 'лазертаг',
+        paintball: 'пейнтбол',
+        open: 'страйкбол (открытая)'
+      };
+    
+      receipt += `1. Игра: ${gameNames[game] || ''}\n`;
+      receipt += `2. Дата/время: ${dateFormatted}\n`;
+    
+      // Количество игроков и суммы
+      if (game === 'open') {
+        let groupSummary = '';
+        if (rent) {
+          total += rent * 6000;
+          groupSummary += `Аренда - ${rent} (${rent * 6000})\n`;
+        }
+        if (own) {
+          total += own * 2000;
+          groupSummary += `Со своим - ${own} (${own * 2000})\n`;
+        }
+        if (driveRent) {
+          total += driveRent * 4000;
+          groupSummary += `Аренда привода - ${driveRent} (${driveRent * 4000})\n`;
+        }
+        if (bdtOwn) {
+          total += bdtOwn * 500;
+          groupSummary += `Бдт со своим - ${bdtOwn} (${bdtOwn * 500})\n`;
+        }
+        if (bdtRent) {
+          total += bdtRent * 3000;
+          groupSummary += `Бдт аренда - ${bdtRent} (${bdtRent * 3000})\n`;
+        }
+        receipt += `3. Количество игроков:\n${groupSummary}`;
+      } else {
+        let costPerPlayer = game === 'airsoft' ? 6000 : game === 'lasertag' ? 4000 : 7500;
+        let totalPlayers = players;
+        if (hasBirthday && players > 0) {
+          totalPlayers -= 1;
+        }
+        total += totalPlayers * costPerPlayer;
+        receipt += `3. Количество игроков: ${players} (${totalPlayers * costPerPlayer})\n`;
+      }
+    
+      if (game !== 'paintball') {
+        receipt += `4. Магазины: ${mags ? `${mags} (${mags * 1200})` : ''}\n`;
+        total += mags * 1200;
+      } else {
+        if (balls) {
+          let packs = Math.ceil(balls / 50);
+          total += packs * 1000;
+          receipt += `4. Магазины: ${packs}x50 (${packs * 1000})\n`;
+        } else {
+          receipt += `4. Магазины:\n`;
+        }
+      }
+    
+      receipt += `5. Гранаты: ${grenades ? `${grenades} (${grenades * 1000})` : ''}\n`;
+      total += grenades * 1000;
+    
+      if (enablePrepay) {
+        receipt += `6. Предоплата: ${prepay}тг\n`;
+      } else {
+        receipt += `6. Предоплата:\n`;
+      }
+    
+      if (game !== 'open') {
+        receipt += `7. Именинник: ${hasBirthday ? 'да' : '-'}\n`;
+      } else {
+        receipt += `7. Именинник: -\n`;
+      }
+    
+      // Доп. услуги
+      if (bbqHours > 0) {
+        total += bbqHours * 6000;
+        receipt += `Дополнительно: Мангалка - ${bbqHours}ч (${bbqHours * 6000})\n`;
+      }
+    
+      if (quad > 0) {
+        receipt += `Дополнительно: Квадроцикл - (${quad})\n`;
+        total += quad;
+      }
+    
+      receipt += `8. Итого: ${total}\n`;
+      receipt += `9. Без предоплаты: ${total - prepay}\n`;
+      receipt += `10. Комментарии: ${comment}`;
+    
+      document.getElementById('receipt').innerText = receipt;
+    }
+    
+    function copyReceipt() {
+      const receiptText = document.getElementById('receipt').innerText;
+      navigator.clipboard.writeText(receiptText).then(() => {
+        alert('Чек скопирован!');
+      });
+    }
+
   </script>
 </body>
 </html>
