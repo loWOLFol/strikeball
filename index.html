@@ -286,7 +286,7 @@
       if (game === 'open') {
         let groupSummary = '';
         if (rent) {
-          total += rent * 6000;
+          total += rent * 7000;
           groupSummary += `Аренда - ${rent} (${rent * 6000})\n`;
         }
         if (own) {
@@ -307,7 +307,7 @@
         }
         receipt += `3. Количество игроков:\n${groupSummary}`;
       } else {
-        let costPerPlayer = game === 'airsoft' ? 6000 : game === 'lasertag' ? 4000 : 7500;
+        let costPerPlayer = game === 'airsoft' ? 7000 : game === 'lasertag' ? 5000 : 8500;
         let totalPlayers = players;
         
         if (hasBirthday && players > 0 && game !== 'open') {
