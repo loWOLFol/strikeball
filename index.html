@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Калькулятор услуг</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f2f2f2;
+    }
+
+    h1, h2 {
+      text-align: center;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 15px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="datetime-local"],
+    select,
+    textarea {
+      padding: 10px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    textarea {
+      height: 100px;
+      resize: vertical;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .checkbox-label input[type="checkbox"] {
+      margin-right: 8px;
+    }
+
+    button {
+      background-color: #28a745;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    .section {
+      margin-top: 30px;
+    }
+
+    .reset {
+      background:#dc3545;
+      margin-bottom: 15px;
+    }
+
+    #receipt {
+      white-space: pre-wrap;
+      border: 1px solid #ccc;
+      padding: 15px;
+      background: #fafafa;
+      border-radius: 5px;
+      font-family: monospace;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+
+      .container {
+        padding: 15px;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Калькулятор услуг</h1>
+    <button class="reset" onclick="resetForm()">Сбросить форму</button>
+
+    <label>Выбор игры:
+      <select id="game" onchange="updateForm()">
+        <option value="">-- Выберите игру --</option>
+        <option value="airsoft">Страйкбол</option>
+        <option value="lasertag">Лазертаг</option>
+        <option value="paintball">Пейнтбол</option>
+        <option value="open">Страйкбол (открытая)</option>
+      </select>
+    </label>
+
+    <label>Дата и время:
+      <input type="datetime-local" id="datetime">
+    </label>
+
+    <div id="fields">
+      <label id="labelPlayers">Количество игроков:
+        <input id="players" type="number">
+      </label>
+
+      <label id="labelDriveAirsoft">Аренда привода:
+        <input id="driveRentAirsoft" type="number">
+      </label>
+      <label id="labelUniformAirsoft">Аренда формы:
+        <input id="uniformRentAirsoft" type="number">
+      </label>
+
+      <label id="labelRent">Аренда (открытая):
+        <input id="rent" type="number">
+      </label>
+      <label id="labelOwn">Со своим (открытая):
+        <input id="own" type="number">
+      </label>
+      <label id="labelDrive">Аренда привода (открытая):
+        <input id="driveRent" type="number">
+      </label>
+      <label id="labelBdtOwn">БДТ со своим (открытая):
+        <input id="bdtOwn" type="number">
+      </label>
+      <label id="labelBdtRent">БДТ аренда (открытая):
+        <input id="bdtRent" type="number">
+      </label>
+
+      <label id="labelBalls">Количество шаров (для пейнтбола):
+        <input id="balls" type="number">
+      </label>
+      <label id="labelMags">Магазины:
+        <input id="mags" type="number">
+      </label>
+      <label id="labelGrenades">Гранаты:
+        <input id="grenades" type="number">
+      </label>
+
+      <div class="checkbox-label" id="labelBirthday">
+        <input type="checkbox" id="birthday">
+        <label for="birthday">Есть именинник</label>
+      </div>
+
+      <div class="checkbox-label" id="labelPrepayToggle">
+        <input type="checkbox" id="enablePrepay" checked onchange="togglePrepay()">
+        <label for="enablePrepay">Включить предоплату</label>
+      </div>
+
+      <label id="labelPrepay">Предоплата (фиксированная 10000):
+        <input id="prepay" type="number" value="10000" disabled>
+      </label>
+
+      <label>Продление мангалки (часов):
+        <input id="bbqHours" type="number">
+      </label>
+
+      <label>Комментарии:
+        <textarea id="comment"></textarea>
+      </label>
+    </div>
+
+    <button onclick="generateReceipt()">Сформировать чек</button>
+
+    <div class="section">
+      <h2>Ведомость (чек)</h2>
+      <div id="receipt"></div>
+      <button onclick="copyReceipt()">Скопировать чек</button>
+    </div>
+  </div>
+
+  <script>
+    function togglePrepay() {
+      const enablePrepay = document.getElementById('enablePrepay').checked;
+      const prepayInput = document.getElementById('prepay');
+      prepayInput.disabled = !enablePrepay;
+    }
+
+    function updateForm() {
+      const game = document.getElementById('game').value;
+      const labels = {
+        players: 'labelPlayers',
+        balls: 'labelBalls',
+        mags: 'labelMags',
+        grenades: 'labelGrenades',
+        rent: 'labelRent',
+        own: 'labelOwn',
+        drive: 'labelDrive',
+        bdtOwn: 'labelBdtOwn',
+        bdtRent: 'labelBdtRent',
+        birthday: 'labelBirthday',
+        prepayToggle: 'labelPrepayToggle',
+        prepay: 'labelPrepay',
+        driveAirsoft: 'labelDriveAirsoft',
+        uniformAirsoft: 'labelUniformAirsoft'
+      };
+
+      for (const key in labels) {
+        document.getElementById(labels[key]).classList.add('hidden');
+      }
+
+      if (game === 'airsoft') {
+        ['players', 'mags', 'grenades', 'birthday', 'prepayToggle', 'prepay', 'driveAirsoft', 'uniformAirsoft'].forEach(k =>
+          document.getElementById(labels[k]).classList.remove('hidden')
+        );
+      } else if (game === 'lasertag') {
+        ['players', 'birthday', 'prepayToggle', 'prepay'].forEach(k =>
+          document.getElementById(labels[k]).classList.remove('hidden')
+        );
+      } else if (game === 'paintball') {
+        ['players', 'balls', 'grenades', 'birthday', 'prepayToggle', 'prepay'].forEach(k =>
+          document.getElementById(labels[k]).classList.remove('hidden')
+        );
+      } else if (game === 'open') {
+        ['rent', 'own', 'drive', 'bdtOwn', 'bdtRent', 'mags', 'grenades', 'prepayToggle', 'prepay'].forEach(k =>
+          document.getElementById(labels[k]).classList.remove('hidden')
+        );
+      }
+
+      if (game === 'open') {
+        document.getElementById('enablePrepay').checked = false;
+        document.getElementById('prepay').disabled = true;
+      } else {
+        document.getElementById('enablePrepay').checked = true;
+        document.getElementById('prepay').disabled = false;
+      }
+    }
+
+    function generateReceipt() {
+      const game = document.getElementById('game').value;
+      const datetimeRaw = document.getElementById('datetime').value;
+      const dateObj = new Date(datetimeRaw);
+      const dateFormatted = datetimeRaw ? `${dateObj.toLocaleDateString('ru-RU')} / ${dateObj.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}` : '';
+
+      const players = +document.getElementById('players').value || 0;
+      const balls = +document.getElementById('balls').value || 0;
+      const mags = +document.getElementById('mags').value || 0;
+      const grenades = +document.getElementById('grenades').value || 0;
+
+      const rent = +document.getElementById('rent').value || 0;
+      const own = +document.getElementById('own').value || 0;
+      const driveRent = +document.getElementById('driveRent').value || 0;
+      const bdtOwn = +document.getElementById('bdtOwn').value || 0;
+      const bdtRent = +document.getElementById('bdtRent').value || 0;
+
+      const driveRentAirsoft = +document.getElementById('driveRentAirsoft').value || 0;
+      const uniformRentAirsoft = +document.getElementById('uniformRentAirsoft').value || 0;
+
+      const hasBirthday = document.getElementById('birthday').checked;
+      const enablePrepay = document.getElementById('enablePrepay').checked;
+      const prepay = enablePrepay ? 10000 : 0;
+
+      const bbqHours = +document.getElementById('bbqHours').value || 0;
+      const comment = document.getElementById('comment').value;
+
+      let total = 0;
+      let receipt = '';
+
+      const gameNames = {
+        airsoft: 'страйкбол',
+        lasertag: 'лазертаг',
+        paintball: 'пейнтбол',
+        open: 'страйкбол (открытая)'
+      };
+
+      receipt += `1. Игра: ${gameNames[game] || ''}\n`;
+      receipt += `2. Дата/время: ${dateFormatted}\n`;
+
+      if (game === 'open') {
+        let groupSummary = '';
+        if (rent) {
+          total += rent * 7000;
+          groupSummary += `Аренда - ${rent} (${rent * 7000})\n`;
+        }
+        if (own) {
+          total += own * 2000;
+          groupSummary += `Со своим - ${own} (${own * 2000})\n`;
+        }
+        if (driveRent) {
+          total += driveRent * 4500;
+          groupSummary += `Аренда привода - ${driveRent} (${driveRent * 4500})\n`;
+        }
+        if (bdtOwn) {
+          total += bdtOwn * 500;
+          groupSummary += `Бдт со своим - ${bdtOwn} (${bdtOwn * 500})\n`;
+        }
+        if (bdtRent) {
+          total += bdtRent * 3000;
+          groupSummary += `Бдт аренда - ${bdtRent} (${bdtRent * 3000})\n`;
+        }
+        receipt += `3. Количество игроков:\n${groupSummary}`;
+      } else if (game === 'airsoft') {
+        let costPerPlayer = 7000;
+        let totalPlayers = players;
+
+        if (hasBirthday && players > 0) {
+          totalPlayers -= 1;
+        }
+
+        total += totalPlayers * costPerPlayer;
+        receipt += `3. Количество игроков: ${players} (${totalPlayers * costPerPlayer})\n`;
+
+        if (driveRentAirsoft > 0) {
+          total += driveRentAirsoft * 4500;
+          receipt += `   Аренда приводов: ${driveRentAirsoft} (${driveRentAirsoft * 4500})\n`;
+        }
+
+        if (uniformRentAirsoft > 0) {
+          total += uniformRentAirsoft * 3000;
+          receipt += `   Аренда формы: ${uniformRentAirsoft} (${uniformRentAirsoft * 3000})\n`;
+        }
+      } else {
+        let costPerPlayer = game === 'lasertag' ? 5000 : 8500;
+        let totalPlayers = players;
+
+        if (hasBirthday && players > 0) {
+          totalPlayers -= 1;
+        }
+
+        total += totalPlayers * costPerPlayer;
+        receipt += `3. Количество игроков: ${players} (${totalPlayers * costPerPlayer})\n`;
+      }
+
+      if (game !== 'paintball') {
+        receipt += `4. Магазины: ${mags ? `${mags} (${mags * 1200})` : ''}\n`;
+        total += mags * 1200;
+      } else {
+        if (balls) {
+          let packs = Math.ceil(balls / 50);
+          total += packs * 1000;
+          receipt += `4. Магазины: ${packs}x50 (${packs * 1000})\n`;
+        } else {
+          receipt += `4. Магазины:\n`;
+        }
+      }
+
+      receipt += `5. Гранаты: ${grenades ? `${grenades} (${grenades * 1000})` : ''}\n`;
+      total += grenades * 1000;
+
+      receipt += `6. Предоплата: ${enablePrepay ? prepay + 'тг' : ''}\n`;
+      receipt += `7. Именинник: ${game !== 'open' ? (hasBirthday ? 'да' : '-') : '-'}\n`;
+
+      if (bbqHours > 0) {
+        total += bbqHours * 6000;
+        receipt += `Дополнительно: Мангалка - ${bbqHours}ч (${bbqHours * 6000})\n`;
+      }
+
+      receipt += `8. Итого: ${total}\n`;
+      receipt += `9. Без предоплаты: ${total - prepay}\n`;
+      receipt += `10. Комментарии: ${comment}`;
+
+      document.getElementById('receipt').innerText = receipt;
+
+    // Сохраняем данные в localStorage
+      localStorage.setItem('savedForm', JSON.stringify({
+        game,
+        datetime: datetimeRaw,
+        players,
+        balls,
+        mags,
+        grenades,
+        rent,
+        own,
+        driveRent,
+        bdtOwn,
+        bdtRent,
+        driveRentAirsoft,
+        uniformRentAirsoft,
+        hasBirthday,
+        enablePrepay,
+        bbqHours,
+        comment
+      }));
+
+    }
+
+    function copyReceipt() {
+      const receiptText = document.getElementById('receipt').innerText;
+      navigator.clipboard.writeText(receiptText).then(() => {
+        alert('Чек скопирован!');
+      });
+    }
+
+    // Восстанавливаем данные из localStorage
+    window.addEventListener('DOMContentLoaded', () => {
+      const saved = JSON.parse(localStorage.getItem('savedForm') || '{}');
+      if (!saved || Object.keys(saved).length === 0) return;
+
+      document.getElementById('game').value = saved.game || '';
+      updateForm();
+      document.getElementById('datetime').value = saved.datetime || '';
+      document.getElementById('players').value = saved.players || '';
+      document.getElementById('balls').value = saved.balls || '';
+      document.getElementById('mags').value = saved.mags || '';
+      document.getElementById('grenades').value = saved.grenades || '';
+      document.getElementById('rent').value = saved.rent || '';
+      document.getElementById('own').value = saved.own || '';
+      document.getElementById('driveRent').value = saved.driveRent || '';
+      document.getElementById('bdtOwn').value = saved.bdtOwn || '';
+      document.getElementById('bdtRent').value = saved.bdtRent || '';
+      document.getElementById('driveRentAirsoft').value = saved.driveRentAirsoft || '';
+      document.getElementById('uniformRentAirsoft').value = saved.uniformRentAirsoft || '';
+      document.getElementById('birthday').checked = saved.hasBirthday || false;
+      document.getElementById('enablePrepay').checked = saved.enablePrepay ?? true;
+      togglePrepay();
+      document.getElementById('bbqHours').value = saved.bbqHours || '';
+      document.getElementById('comment').value = saved.comment || '';
+    });
+
+    function resetForm() {
+      localStorage.removeItem('savedForm');
+      document.getElementById('game').value = '';
+      updateForm();
+      document.getElementById('datetime').value = '';
+      document.getElementById('players').value = '';
+      document.getElementById('balls').value = '';
+      document.getElementById('mags').value = '';
+      document.getElementById('grenades').value = '';
+      document.getElementById('rent').value = '';
+      document.getElementById('own').value = '';
+      document.getElementById('driveRent').value = '';
+      document.getElementById('bdtOwn').value = '';
+      document.getElementById('bdtRent').value = '';
+      document.getElementById('driveRentAirsoft').value = '';
+      document.getElementById('uniformRentAirsoft').value = '';
+      document.getElementById('birthday').checked = false;
+      document.getElementById('enablePrepay').checked = true;
+      togglePrepay();
+      document.getElementById('prepay').value = 10000;
+      document.getElementById('bbqHours').value = '';
+      document.getElementById('comment').value = '';
+      document.getElementById('receipt').innerText = '';
+    }
+</script>
+</body>
+</html>
