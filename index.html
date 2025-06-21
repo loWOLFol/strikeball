@@ -171,14 +171,14 @@
       <label>Продление мангалки (часов):
         <input id="bbqHours" type="number">
       </label>
-      <label>Прокат квадроциклов:
+<!--       <label>Прокат квадроциклов:
         <select id="quad">
           <option value="0">-- Не выбрано --</option>
           <option value="4000">20 мин (4000)</option>
           <option value="7000">40 мин (7000)</option>
           <option value="10000">1 час (10000)</option>
         </select>
-      </label>
+      </label> -->
 
       <label>Комментарии:
         <textarea id="comment"></textarea>
@@ -352,10 +352,10 @@
         receipt += `Дополнительно: Мангалка - ${bbqHours}ч (${bbqHours * 6000})\n`;
       }
     
-      if (quad > 0) {
-        receipt += `Дополнительно: Квадроцикл - (${quad})\n`;
-        total += quad;
-      }
+      // if (quad > 0) {
+      //   receipt += `Дополнительно: Квадроцикл - (${quad})\n`;
+      //   total += quad;
+      // }
     
       receipt += `8. Итого: ${total}\n`;
       receipt += `9. Без предоплаты: ${total - prepay}\n`;
