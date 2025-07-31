@@ -77,6 +77,7 @@
     </label>
     <button onclick="generateReceipt()">Сформировать ведомость</button>
     <pre id="receipt"></pre>
+    <button onclick="copyReceipt()">Скопировать чек</button>
     <button onclick="saveToHistory()">Сохранить в историю</button>
   </div>
 </div>
@@ -84,7 +85,15 @@
   <div class="container">
     <h1>История ведомостей</h1>
     <table id="historyTable">
-      <thead><tr><th>Дата</th><th>Игра</th><th>Сумма</th><th>Оплата</th><th>Действия</th></tr></thead>
+      <thead>
+        <tr>
+          <th>Дата</th>
+          <th>Игра</th>
+          <th>Сумма</th>
+          <th>Предоплата</th>
+          <th>Оплата</th>
+        </tr>
+      </thead>
       <tbody></tbody>
     </table>
   </div>

@@ -4,7 +4,7 @@ const settings = JSON.parse(localStorage.getItem('settings')) || {
     paintball: 8500,
     mags: 1200,
     grenades: 1000,
-    balls: 20,
+    balls: 1000,
     rent: 7000,
     own: 2000,
     drive: 4500,
@@ -89,41 +89,60 @@ function generateReceipt() {
     }
 
     if (game === 'paintball' && balls) {
-        receipt += `4. Магазины: ${mags}x50\n`;
+        receipt += `4. Магазины: ${balls}x50 (${balls * settings.balls})\n`;
     } else {
         receipt += `4. Магазины: ${mags} (${mags * settings.mags})\n`;
     }
 
     receipt += `5. Гранаты: ${grenades} (${grenades * settings.grenades})\n`;
-    receipt += `6. Предоплата: ${prepay || 0}тг\n`;
-    receipt += `7. Именинник: -\n8. Итого: ${total}\n9. Без предоплаты: ${total - prepay}\n10. Комментарии: ${comment}\nОплата наличными: ${cash}\nОплата через Pay: ${pay}`;
+    receipt += `6. Предоплата: ${prepay || 0}\n`;
+    receipt += `7. Именинник: -\n8. Итого: ${total}\n9. Без предоплаты: ${total - prepay}\n10. Комментарии:\n${comment}\n`;
+    if (bbqHours > 0) {
+        total += bbqHours * 6000;
+        receipt += `Дополнительно: Мангалка - ${bbqHours}ч (${bbqHours * 6000})\n\nОплата наличными: ${cash}\nОплата через Pay: ${pay}`;
+    }
     document.getElementById('receipt').innerText = receipt;
+}
+
+function copyReceipt() {
+    const receiptText = document.getElementById('receipt').innerText;
+    navigator.clipboard.writeText(receiptText).then(() => {
+        alert('Чек скопирован!');
+    });
 }
 
 function saveToHistory() {
     const receiptText = document.getElementById('receipt').innerText;
     if (!receiptText) return alert('Сначала сформируй ведомость');
 
+    const isPrepay = document.getElementById('prepay').checked;
+
     const rawDate = new Date(document.getElementById('datetime').value);
     const datetime = rawDate.toLocaleDateString('ru-RU').replace(/\//g, '.') + ' / ' +
                     rawDate.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
 
     const totalMatch = /Итого:\s*(\d+)/.exec(receiptText);
+    const noPrepayMatch = /Без предоплаты:\s*(\d+)/.exec(receiptText);
     const total = totalMatch ? Number(totalMatch[1]) : 0;
+    const noPrepay = noPrepayMatch ? Number(noPrepayMatch[1]) : 0;
+
     const game = document.getElementById('game').value;
     const cash = +getValue('cash');
     const pay = +getValue('pay');
+
     const history = JSON.parse(localStorage.getItem('history') || '[]');
     history.push({
         datetime,
         game,
-        total,
+        total: `${total} / ${noPrepay}`,
         receipt: receiptText,
-        payment: `Наличные: ${cash} / Pay: ${pay}`
+        payment: `Наличные: ${cash} / Pay: ${pay}`,
+        prepay: isPrepay ? 'Да' : 'Нет'
     });
     localStorage.setItem('history', JSON.stringify(history));
     alert('Сохранено в историю');
 }
+
 
 
 
@@ -139,19 +158,9 @@ function renderHistory() {
     };
     history.forEach((h, i) => {
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${h.datetime}</td><td>${names[h.game]}</td><td>${h.total}</td><td>${h.payment}</td><td><button onclick="downloadPDF(${i})">PDF</button></td>`;
+        tr.innerHTML = `<td>${h.datetime}</td><td>${names[h.game]}</td><td>${h.total}</td><td>${h.prepay || 'Нет данных'}</td><td>${h.payment}</td>`;
         tbody.appendChild(tr);
     });
-}
-
-function downloadPDF(index) {
-    const history = JSON.parse(localStorage.getItem('history') || '[]');
-    const item = history[index];
-    const blob = new Blob([item.receipt], { type: 'application/pdf' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `${item.datetime}.pdf`;
-    link.click();
 }
 
 function clearHistory() {
