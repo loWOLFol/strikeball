@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Ведомости Инструктора</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="manifest.json">
+  <script src="app.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav>
+  <button onclick="showTab('main')" class="active">Главная</button>
+  <button onclick="showTab('history')">История</button>
+  <button onclick="showTab('settings')">Настройки</button>
+</nav>
+<div id="main" class="tab active">
+  <div class="container">
+    <button class="danger" onclick="clearForm()">Очистить все поля</button>
+    <h1>Создать ведомость</h1>
+    <label>Выберите игру:
+      <select id="game" onchange="updateFields()">
+        <option value="">-- Выберите игру --</option>
+        <option value="airsoft">Страйкбол</option>
+        <option value="lasertag">Лазертаг</option>
+        <option value="paintball">Пейнтбол</option>
+        <option value="open">Страйкбол (открытая)</option>
+      </select>
+    </label>
+    <label>Дата и время:
+      <input type="datetime-local" id="datetime">
+    </label>
+    <label>Количество игроков:
+      <input type="number" id="players">
+    </label>
+    <label>Магазины:
+      <input type="number" id="mags">
+    </label>
+    <label>Гранаты:
+      <input type="number" id="grenades">
+    </label>
+    <label>Количество шаров:
+      <input type="number" id="balls">
+    </label>
+    <label>Аренда:
+      <input type="number" id="rent">
+    </label>
+    <label>Со своим:
+      <input type="number" id="own">
+    </label>
+    <label>Аренда привода:
+      <input type="number" id="driveRent">
+    </label>
+    <label>Аренда формы:
+      <input type="number" id="uniformRentAirsoft">
+    </label>
+    <label>БДТ со своим:
+      <input type="number" id="bdtOwn">
+    </label>
+    <label>БДТ аренда:
+      <input type="number" id="bdtRent">
+    </label>
+    <label>Есть именинник
+      <input type="checkbox" id="birthday">
+    </label>
+    <label>Продление мангалки:
+      <input type="number" id="bbqHours">
+    </label>
+    <label>Оплата наличными:
+      <input type="number" id="cash">
+    </label>
+    <label>Оплата через Pay:
+      <input type="number" id="pay">
+    </label>
+    <label>Предоплата:
+      <input type="checkbox" id="prepay" checked>
+    </label>
+    <label>Комментарии:
+      <textarea id="comment"></textarea>
+    </label>
+    <button onclick="generateReceipt()">Сформировать ведомость</button>
+    <pre id="receipt"></pre>
+    <button onclick="copyReceipt()">Скопировать чек</button>
+    <button onclick="saveToHistory()">Сохранить в историю</button>
+  </div>
+</div>
+<div id="history" class="tab">
+  <div class="container">
+    <h1>История ведомостей</h1>
+    <table id="historyTable">
+      <thead>
+        <tr>
+          <th>Дата</th>
+          <th>Игра</th>
+          <th>Сумма</th>
+          <th>Предоплата</th>
+          <th>Оплата</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+<div id="settings" class="tab">
+  <div class="container">
+    <h1>Настройки цен</h1>
+    <label>Цена за игрока страйкбол:
+      <input type="number" id="price_airsoft">
+    </label>
+    <label>Цена за игрока лазертаг:
+      <input type="number" id="price_lasertag">
+    </label>
+    <label>Цена за игрока пейнтбол:
+      <input type="number" id="price_paintball">
+    </label>
+    <label>Цена за магазины:
+      <input type="number" id="price_mags">
+    </label>
+    <label>Цена за гранаты:
+      <input type="number" id="price_grenades">
+    </label>
+    <label>Цена за шары:
+      <input type="number" id="price_balls">
+    </label>
+    <label>Цена за аренду (открытая):
+      <input type="number" id="price_rent">
+    </label>
+    <label>Цена за со своим (открытая):
+      <input type="number" id="price_own">
+    </label>
+    <label>Цена за аренду привода:
+      <input type="number" id="price_drive">
+    </label>
+    <label>Цена за аренду формы:
+      <input type="number" id="price_uniform">
+    </label>
+    <label>Цена за БДТ со своим:
+      <input type="number" id="price_bdtOwn">
+    </label>
+    <label>Цена за БДТ аренда:
+      <input type="number" id="price_bdtRent">
+    </label>
+    <label>Цена за продление мангалки (час):
+      <input type="number" id="price_bbqHours">
+    </label>
+    <button onclick="saveSettings()">Сохранить настройки</button>
+    <button class="danger" onclick="clearHistory()">Очистить историю</button>
+  </div>
+</div>
+</body>
+</html>
