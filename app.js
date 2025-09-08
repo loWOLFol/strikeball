@@ -35,13 +35,15 @@ function updateFields() {
     all.forEach(id => document.getElementById(id).parentElement.classList.add('hidden'));
     document.getElementById('prepay').checked = true;
     document.getElementById('prepay').parentElement.classList.remove('hidden');
-    if (game === 'airsoft') ['players', 'mags', 'grenades', 'driveRent', 'uniformRentAirsoft', 'bbqHours'].forEach(show);
-    if (game === 'lasertag') ['players', 'bbqHours'].forEach(show);
-    if (game === 'paintball') ['players', 'grenades', 'balls', 'bbqHours'].forEach(show);
+    if (game === 'airsoft') ['players', 'mags', 'grenades', 'driveRent', 'uniformRentAirsoft', 'own', 'birthday', 'bbqHours'].forEach(show);
+    if (game === 'lasertag') ['players', 'birthday', 'bbqHours'].forEach(show);
+    if (game === 'paintball') ['players', 'grenades', 'balls', 'birthday', 'bbqHours'].forEach(show);
     if (game === 'open') {
         ['mags', 'grenades', 'rent', 'own', 'driveRent', 'uniformRentAirsoft', 'bdtOwn', 'bdtRent'].forEach(show);
         document.getElementById('prepay').checked = false;
         document.getElementById('prepay').parentElement.classList.add('hidden');
+        document.getElementById('birthday').checked = false;
+        document.getElementById('birthday').parentElement.classList.add('hidden');
     }
     function show(id) { document.getElementById(id).parentElement.classList.remove('hidden'); }
 }
@@ -58,6 +60,7 @@ function generateReceipt() {
     const datetime = rawDate.toLocaleDateString('ru-RU').replace(/\//g, '.') + ' / ' +
                 rawDate.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
     const prepay = document.getElementById('prepay').checked ? 10000 : 0;
+    const hasBirthday = document.getElementById('birthday').checked;
     const players = +getValue('players');
     const mags = +getValue('mags');
     const grenades = +getValue('grenades');
@@ -73,20 +76,79 @@ function generateReceipt() {
     const pay = +getValue('pay');
     const comment = document.getElementById('comment').value;
     let total = 0;
-    if (game === 'airsoft') total += players * settings.airsoft;
-    if (game === 'lasertag') total += players * settings.lasertag;
-    if (game === 'paintball') total += players * settings.paintball;
-    total += mags * settings.mags + grenades * settings.grenades + balls * settings.balls + rent * settings.rent;
-    total += own * settings.own + drive * settings.drive + uniform * settings.uniform;
-    total += bdtOwn * settings.bdtOwn + bdtRent * settings.bdtRent + bbqHours * settings.bbqHours;
+    let totalPlayers = players;
+    if (hasBirthday && players > 0) {
+        totalPlayers = Math.max(players - 1, 0); // уменьшаем только если есть игроки
+    }
+    if (game === 'airsoft') total += totalPlayers * settings.airsoft;
+    if (game === 'lasertag') total += totalPlayers * settings.lasertag;
+    if (game === 'paintball') total += totalPlayers * settings.paintball;
+    total += mags * settings.mags + grenades * settings.grenades + balls * settings.balls;
+    total += bbqHours * settings.bbqHours;
 
     let receipt = `1. Игра: ${names[game] || ''}\n2. Дата/время: ${datetime}\n`;
 
     if (game === 'open') {
-        receipt += `3. Количество игроков:\nАренда - ${rent} (${rent * settings.rent})\nСо своим - ${own} (${own * settings.own})\nАренда привода - ${drive} (${drive * settings.drive})\nАренда формы - ${uniform} (${uniform * settings.uniform})\nБДТ со своим - ${bdtOwn} (${bdtOwn * settings.bdtOwn})\nБДТ аренда - ${bdtRent} (${bdtRent * settings.bdtRent})\n`;
-    } else {
-        receipt += `3. Количество игроков: ${players} (${players * (settings[game] || 0)})\n`;
+        let groupSummary = '';
+        if (rent > 0) {
+            total += rent * settings.rent;
+            groupSummary += `Аренда - ${rent} (${rent * settings.rent})\n`;
+        }
+        if (own > 0) {
+            total += own * settings.own;
+            groupSummary += `Со своим - ${own} (${own * settings.own})\n`;
+        }
+        if (drive > 0) {
+            total += drive * settings.drive;
+            groupSummary += `Аренда привода - ${drive} (${drive * settings.drive})\n`;
+        }
+
+        if (uniform > 0) {
+            total += uniform * settings.uniform;
+            groupSummary += `Аренда формы - ${uniform} (${uniform * settings.uniform})\n`;
+        }
+
+        if (bdtOwn > 0) {
+            total += bdtOwn * 500;
+            groupSummary += `БДТ со своим - ${bdtOwn} (${bdtOwn * settings.bdtOwn})\n`;
+        }
+        if (bdtRent > 0) {
+            total += bdtRent * 3000;
+            groupSummary += `БДТ аренда - ${bdtRent} (${bdtRent * settings.bdtRent})\n`;
+        }
+
+
+        if (groupSummary !== '') {
+            receipt += `3. Количество игроков:\n${groupSummary}`;
+        }
+    } else{
+        if (game === 'airsoft') {
+            let groupSummary = '';
+            if (players > 0) {
+                groupSummary += `${players} (${totalPlayers * (settings[game] || 0)})\n`
+            }
+            if (own > 0) {
+                total += own * settings.own;
+                groupSummary += `Со своим - ${own} (${own * settings.own})\n`;
+            }
+            if (drive > 0) {
+                total += drive * settings.drive;
+                groupSummary += `Аренда привода - ${drive} (${drive * settings.drive})\n`;
+            }
+
+            if (uniform > 0) {
+                total += uniform * settings.uniform;
+                groupSummary += `Аренда формы - ${uniform} (${uniform * settings.uniform})\n`;
+            }
+
+            if (groupSummary !== '') {
+                receipt += `3. Количество игроков:${groupSummary}`;
+            }
+        } else {
+        receipt += `3. Количество игроков: ${players} (${totalPlayers * (settings[game] || 0)})\n`;
     }
+    }
+    
 
     if (game === 'paintball' && balls) {
         receipt += `4. Магазины: ${balls}x50 (${balls * settings.balls})\n`;
@@ -96,11 +158,20 @@ function generateReceipt() {
 
     receipt += `5. Гранаты: ${grenades} (${grenades * settings.grenades})\n`;
     receipt += `6. Предоплата: ${prepay || 0}\n`;
-    receipt += `7. Именинник: -\n8. Итого: ${total}\n9. Без предоплаты: ${total - prepay}\n10. Комментарии:\n${comment}\n`;
+    if (game !== 'open') {
+        receipt += `7. Именинник: ${hasBirthday ? 'да' : '-'}\n`;
+    } else {
+        receipt += `7. Именинник: -\n`;
+    }
+
+    receipt += `8. Итого: ${total}\n`;
+    receipt += `9. Без предоплаты: ${total - prepay}\n10. Комментарии:\n${comment}\n`;
     if (bbqHours > 0) {
         total += bbqHours * 6000;
-        receipt += `Дополнительно: Мангалка - ${bbqHours}ч (${bbqHours * 6000})\n\nОплата наличными: ${cash}\nОплата через Pay: ${pay}`;
+        receipt += `Дополнительно: Мангалка - ${bbqHours}ч (${bbqHours * 6000})\n`;
     }
+    receipt += `\nОплата наличными: ${cash}\n`;
+    receipt += `Оплата через Pay: ${pay}`;
     document.getElementById('receipt').innerText = receipt;
 }
 
