@@ -1,0 +1,273 @@
+:root {
+    --bg: #f3f6f1;
+    --panel: #ffffff;
+    --text: #1f2a24;
+    --muted: #65736b;
+    --line: #d9e1db;
+    --field: #fbfdfb;
+    --primary: #176f55;
+    --primary-hover: #115641;
+    --accent: #d47a2a;
+    --sky: #236f83;
+    --secondary: #fff4e6;
+    --secondary-hover: #fde8ca;
+    --danger: #c24141;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background:
+        linear-gradient(135deg, rgba(23, 111, 85, 0.12), rgba(212, 122, 42, 0.1) 46%, rgba(35, 111, 131, 0.12)),
+        var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.app-nav {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.94);
+    border-bottom: 1px solid var(--line);
+    box-shadow: 0 4px 18px rgba(31, 42, 36, 0.06);
+}
+
+button {
+    min-height: 44px;
+    padding: 0.75rem 1.1rem;
+    border: 0;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--primary), var(--sky));
+    color: #fff;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+
+button:hover {
+    background: linear-gradient(135deg, var(--primary-hover), #1c5c6d);
+    box-shadow: 0 8px 20px rgba(23, 111, 85, 0.2);
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+.app-nav button {
+    min-width: 140px;
+    background: var(--secondary);
+    color: var(--text);
+    box-shadow: none;
+}
+
+.app-nav button:hover,
+button.secondary:hover {
+    background: var(--secondary-hover);
+    box-shadow: none;
+}
+
+.app-nav button.active {
+    background: linear-gradient(135deg, var(--primary), var(--sky));
+    color: #fff;
+}
+
+button.secondary {
+    background: var(--secondary);
+    color: var(--text);
+}
+
+button.danger {
+    background: var(--danger);
+}
+
+.page {
+    width: min(960px, calc(100% - 24px));
+    margin: 0 auto;
+    padding: 1.5rem 0 2rem;
+}
+
+.tab {
+    display: none;
+}
+
+.tab.active {
+    display: block;
+}
+
+.container {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-top: 4px solid var(--primary);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 12px 32px rgba(31, 42, 36, 0.08);
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.eyebrow {
+    margin: 0 0 0.25rem;
+    color: var(--accent);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+h1 {
+    margin: 0;
+    font-size: 1.75rem;
+    line-height: 1.2;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    color: var(--muted);
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    min-height: 44px;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--field);
+    color: var(--text);
+    font: inherit;
+    font-weight: 500;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 3px solid rgba(212, 122, 42, 0.18);
+    border-color: var(--accent);
+    background: #fff;
+}
+
+textarea {
+    resize: vertical;
+}
+
+.checkbox-label {
+    min-height: 44px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0.55rem 0.75rem;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--field);
+    color: var(--text);
+}
+
+.checkbox-label input {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 20px;
+    min-height: 20px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    accent-color: var(--primary);
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+}
+
+.hidden {
+    display: none;
+}
+
+pre {
+    min-height: 120px;
+    margin: 1.25rem 0 0;
+    padding: 1rem;
+    overflow: auto;
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--accent);
+    border-radius: 8px;
+    background: #fbfcfb;
+    color: var(--text);
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 0.95rem;
+    line-height: 1.55;
+    white-space: pre-wrap;
+}
+
+pre:empty {
+    display: none;
+}
+
+@media (max-width: 640px) {
+    .app-nav {
+        justify-content: stretch;
+    }
+
+    .app-nav button {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .page {
+        width: min(100% - 16px, 960px);
+        padding-top: 0.75rem;
+    }
+
+    .container {
+        padding: 1rem;
+    }
+
+    .page-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .page-header button {
+        width: 100%;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+    }
+
+    .actions button {
+        width: 100%;
+    }
+}

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Ведомости Инструктора</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#277a4d">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.json">
+  <script src="app.js" defer></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="app-nav" aria-label="Основная навигация">
+  <button type="button" onclick="showTab('main')" class="active">Ведомость</button>
+  <button type="button" onclick="showTab('settings')">Настройки цен</button>
+</nav>
+
+<main class="page">
+  <section id="main" class="tab active">
+    <div class="container">
+      <div class="page-header">
+        <div>
+          <h1>Создать ведомость</h1>
+        </div>
+        <button type="button" class="secondary" onclick="clearForm()">Очистить</button>
+      </div>
+
+      <div class="form-grid">
+        <label class="full-width">Игра
+          <select id="game" onchange="updateFields()">
+            <option value="">Выберите игру</option>
+            <option value="airsoft">Страйкбол</option>
+            <option value="lasertag">Лазертаг</option>
+            <option value="paintball">Пейнтбол</option>
+            <option value="open">Страйкбол (открытая)</option>
+          </select>
+        </label>
+
+        <label>Дата и время
+          <input type="datetime-local" id="datetime">
+        </label>
+        <label>Количество игроков
+          <input type="number" id="players" min="0" inputmode="numeric">
+        </label>
+        <label>Магазины
+          <input type="number" id="mags" min="0" inputmode="numeric">
+        </label>
+        <label>Гранаты
+          <input type="number" id="grenades" min="0" inputmode="numeric">
+        </label>
+        <label>Количество шаров
+          <input type="number" id="balls" min="0" inputmode="numeric">
+        </label>
+        <label>Аренда
+          <input type="number" id="rent" min="0" inputmode="numeric">
+        </label>
+        <label>Со своим
+          <input type="number" id="own" min="0" inputmode="numeric">
+        </label>
+        <label>Аренда привода
+          <input type="number" id="driveRent" min="0" inputmode="numeric">
+        </label>
+        <label>Аренда формы
+          <input type="number" id="uniformRentAirsoft" min="0" inputmode="numeric">
+        </label>
+        <label>БДТ со своим
+          <input type="number" id="bdtOwn" min="0" inputmode="numeric">
+        </label>
+        <label>БДТ аренда
+          <input type="number" id="bdtRent" min="0" inputmode="numeric">
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="birthday">
+          Есть именинник
+        </label>
+        <label>Продление мангалки
+          <input type="number" id="bbqHours" min="0" inputmode="numeric">
+        </label>
+        <label>Оплата наличными
+          <input type="number" id="cash" min="0" inputmode="numeric">
+        </label>
+        <label>Оплата через Pay
+          <input type="number" id="pay" min="0" inputmode="numeric">
+        </label>
+        <label class="checkbox-label">
+          <input type="checkbox" id="prepay" checked>
+          Предоплата
+        </label>
+        <label class="full-width">Комментарии
+          <textarea id="comment" rows="4"></textarea>
+        </label>
+      </div>
+
+      <div class="actions">
+        <button type="button" onclick="generateReceipt()">Сформировать ведомость</button>
+        <button type="button" class="secondary" onclick="copyReceipt()">Скопировать чек</button>
+      </div>
+
+      <pre id="receipt"></pre>
+    </div>
+  </section>
+
+  <section id="settings" class="tab">
+    <div class="container">
+      <div class="page-header">
+        <div>
+          <h1>Настройки</h1>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <label>Игрок страйкбол
+          <input type="number" id="price_airsoft" min="0" inputmode="numeric">
+        </label>
+        <label>Игрок лазертаг
+          <input type="number" id="price_lasertag" min="0" inputmode="numeric">
+        </label>
+        <label>Игрок пейнтбол
+          <input type="number" id="price_paintball" min="0" inputmode="numeric">
+        </label>
+        <label>Магазины
+          <input type="number" id="price_mags" min="0" inputmode="numeric">
+        </label>
+        <label>Гранаты
+          <input type="number" id="price_grenades" min="0" inputmode="numeric">
+        </label>
+        <label>Шары
+          <input type="number" id="price_balls" min="0" inputmode="numeric">
+        </label>
+        <label>Аренда (открытая)
+          <input type="number" id="price_rent" min="0" inputmode="numeric">
+        </label>
+        <label>Со своим (открытая)
+          <input type="number" id="price_own" min="0" inputmode="numeric">
+        </label>
+        <label>Аренда привода
+          <input type="number" id="price_drive" min="0" inputmode="numeric">
+        </label>
+        <label>Аренда формы
+          <input type="number" id="price_uniform" min="0" inputmode="numeric">
+        </label>
+        <label>БДТ со своим
+          <input type="number" id="price_bdtOwn" min="0" inputmode="numeric">
+        </label>
+        <label>БДТ аренда
+          <input type="number" id="price_bdtRent" min="0" inputmode="numeric">
+        </label>
+        <label>Мангалка за час
+          <input type="number" id="price_bbqHours" min="0" inputmode="numeric">
+        </label>
+      </div>
+
+      <div class="actions">
+        <button type="button" onclick="saveSettings()">Сохранить настройки</button>
+        <button type="button" class="secondary" onclick="resetSettings()">Сбросить цены</button>
+      </div>
+    </div>
+  </section>
+</main>
+</body>
+</html>
